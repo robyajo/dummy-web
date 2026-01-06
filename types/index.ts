@@ -28,3 +28,25 @@ export interface FilterUser {
   role: string;
   id_posyandu: number;
 }
+export type User = {
+  id: number;
+  uuid: string;
+  name: string;
+  email: string;
+  avatar: string;
+  avatar_url: string;
+  role: string;
+  active: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+export type Auth = {
+  id: number;
+  uuid: string;
+  role: string;
+  active: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+};

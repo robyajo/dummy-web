@@ -1,23 +1,24 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   BookOpen,
   Bot,
   Command,
   Frame,
+  LayoutDashboard,
   LifeBuoy,
   Map,
   PieChart,
   Send,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "~/components/nav-main"
-import { NavProjects } from "~/components/nav-projects"
-import { NavSecondary } from "~/components/nav-secondary"
-import { NavUser } from "~/components/nav-user"
+import { NavMain } from "~/components/nav-main";
+import { NavProjects } from "~/components/nav-projects";
+import { NavSecondary } from "~/components/nav-secondary";
+import { NavUser } from "~/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +27,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "~/components/ui/sidebar"
+} from "~/components/ui/sidebar";
+import { SingleMenu } from "./single-menu";
 
 const data = {
   user: {
@@ -150,9 +152,22 @@ const data = {
       icon: Map,
     },
   ],
-}
+};
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  auth,
+  profile,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { auth?: any; profile?: any }) {
+  // Use profile if available (fresh from /me), otherwise auth.user (from session), otherwise default
+  const sourceUser = profile || auth?.user || data.user;
+
+  const currentUser = {
+    name: sourceUser.name || data.user.name,
+    email: sourceUser.email || data.user.email,
+    avatar: sourceUser.avatar_url || sourceUser.avatar || data.user.avatar,
+  };
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -173,13 +188,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <SingleMenu
+          items={[
+            {
+              title: "Dashboard",
+              url: "/dashboard",
+              icon: LayoutDashboard,
+            },
+          ]}
+          // className="mt-auto"
+        />
+        <NavMain />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={currentUser} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

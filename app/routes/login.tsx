@@ -2,11 +2,10 @@ import { LoginForm } from "~/components/auth/login-form";
 import type { Route } from "./+types/login";
 import { redirect } from "react-router";
 import { getSession, commitSession } from "../../session.server";
+
+import { toast } from "sonner";
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login" }, { name: "description", content: "Login" }];
-}
-export default function LoginPage() {
-  return <LoginForm />;
 }
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -52,7 +51,7 @@ export async function action({ request }: Route.ActionArgs) {
     const session = await getSession(request.headers.get("Cookie"));
     session.set("auth", json.data);
     const msg = encodeURIComponent(json?.message || "Login successful");
-
+    toast.success(msg);
     return redirect(`/dashboard`, {
       headers: { "Set-Cookie": await commitSession(session) },
     });
@@ -62,4 +61,8 @@ export async function action({ request }: Route.ActionArgs) {
       fieldErrors: "Silakan coba lagi",
     };
   }
+}
+
+export default function LoginPage() {
+  return <LoginForm />;
 }
