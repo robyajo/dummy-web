@@ -23,7 +23,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const auth = session.get("auth");
   const url = new URL(request.url);
-  const success = url.searchParams.get("success") || undefined;
+  const success =
+    session.get("success") || url.searchParams.get("success") || undefined;
   let profile = null;
 
   if (auth?.token?.access_token) {

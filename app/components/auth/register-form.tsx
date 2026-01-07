@@ -1,4 +1,13 @@
 import { GalleryVerticalEnd } from "lucide-react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
@@ -8,43 +17,118 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
+  FieldError,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/password-input";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const actionData = useActionData();
+  const loaderData = useLoaderData<{ success?: string }>();
+  const errors = (actionData?.errors || {}) as Record<string, string[]>;
+  const navigation = useNavigation();
+  const pending = navigation.state === "submitting";
+
+  useEffect(() => {
+    if (actionData?.error) {
+      toast.error(actionData.error, {
+        description: actionData.fieldErrors,
+      });
+    }
+  }, [actionData]);
+
+  useEffect(() => {
+    if (loaderData?.success) {
+      toast.success(loaderData.success);
+    }
+  }, [loaderData]);
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <Form method="post">
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
-            <a
-              href="#"
+            <Link
+              to="/"
               className="flex flex-col items-center gap-2 font-medium"
+              viewTransition
             >
               <div className="flex size-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
               <span className="sr-only">Acme Inc.</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Create an account</h1>
             <FieldDescription>
-              Already have an account? <a href="/">Login</a>
+              Already have an account?{" "}
+              <Link to="/" viewTransition>
+                Login
+              </Link>
             </FieldDescription>
           </div>
-          <Field>
+          <Field data-invalid={!!errors?.name?.length}>
+            <FieldLabel htmlFor="name">Name</FieldLabel>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Nama User"
+              required
+              disabled={pending}
+            />
+            <FieldError
+              errors={errors?.name?.map((m) => ({ message: m })) || []}
+            />
+          </Field>
+          <Field data-invalid={!!errors?.email?.length}>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="m@example.com"
               required
+              disabled={pending}
+            />
+            <FieldError
+              errors={errors?.email?.map((m) => ({ message: m })) || []}
+            />
+          </Field>
+          <Field data-invalid={!!errors?.password?.length}>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <PasswordInput
+              id="password"
+              name="password"
+              placeholder="password123"
+              required
+              disabled={pending}
+            />
+            <FieldError
+              errors={errors?.password?.map((m) => ({ message: m })) || []}
+            />
+          </Field>
+          <Field data-invalid={!!errors?.confirmPassword?.length}>
+            <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="password123"
+              required
+              disabled={pending}
+            />
+            <FieldError
+              errors={
+                errors?.confirmPassword?.map((m) => ({ message: m })) || []
+              }
             />
           </Field>
           <Field>
-            <Button type="submit">Sign up</Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Signing up..." : "Sign up"}
+            </Button>
           </Field>
           <FieldSeparator>Or</FieldSeparator>
           <Field className="grid gap-4 sm:grid-cols-2">
@@ -68,7 +152,7 @@ export function RegisterForm({
             </Button>
           </Field>
         </FieldGroup>
-      </form>
+      </Form>
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.

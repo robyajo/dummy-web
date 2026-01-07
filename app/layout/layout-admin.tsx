@@ -39,7 +39,7 @@ export async function loader({ request }: { request: Request }) {
   const session = await getSession(request.headers.get("Cookie"));
   const auth = session.get("auth");
   const url = new URL(request.url);
-  const success = url.searchParams.get("success") || undefined;
+  const success = session.get("success") || url.searchParams.get("success") || undefined;
 
   let profile = null;
   const baseUrl = import.meta.env.VITE_API_URL;

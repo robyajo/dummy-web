@@ -17,6 +17,7 @@ type SessionData = {
 
 type SessionFlashData = {
   error: string;
+  success?: string;
 };
 
 const { getSession, commitSession, destroySession } =

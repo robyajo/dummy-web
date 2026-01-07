@@ -1,5 +1,5 @@
 import type { Auth, BreadcrumbType, User } from "types";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import ComponentPageAdmin from "~/components/admin/page-admin";
 
@@ -27,10 +27,12 @@ export default function Dashboard({
   success?: string;
 }) {
   const user = profile;
+  const lastSuccessRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (success) {
+    if (success && lastSuccessRef.current !== success) {
       toast.success(success);
+      lastSuccessRef.current = success;
     }
   }, [success]);
 
